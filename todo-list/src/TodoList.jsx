@@ -1,72 +1,73 @@
 import React, { useState } from 'react'
 
-const TodoList = () => {
-    const [todo, setTodo] = useState('')
-    const [allTodo, setAllTodo] = useState([])
+const Todolist = () => {
+    const [inputTodo, setInputTodo] = useState('')
+    const [todo, setTodo] = useState([])
     const [toggle, setToggle] = useState(true)
-    const [editId, setEditId] = useState(null)
-    const [completed, setCompleted] = useState(false)
+    const [editIndex, setEditIndex] = useState(null);
+    const [completed, setCompleted] = useState(false);
 
-    const customCss = {
-        color: "green"
-    }
+    const dynamicStyle = {
+        color: completed ? 'green' : 'black',
+    };
 
     const addTodo = () => {
-        if (!todo) {
-            alert('write something')
-        } 
-            else if(todo && !toggle){
-                    setAllTodo(allTodo.map((item, index) => (index === editId ? allTodo : item)));    
-            }
-        else {
-            setAllTodo((prev) => [...prev, todo])
-            setTodo('')
-            
+        if (!inputTodo) {
+            alert('Fill something')
         }
-
+        else if (inputTodo && !toggle) {
+            setTodo(todo.map((item, index) => (index === editIndex ? inputTodo : item)));
+            setToggle(true);
+            setInputTodo('');
+            setEditIndex(null);
+        }
+        else {
+            setTodo((prev)=>[...prev,inputTodo])
+            setInputTodo('')
+            setToggle(false)
+        }
     }
 
     const deleteTodo = (id) => {
-        const deletedTodo = allTodo.filter((_, index) => {
-            // console.log(index)
-            return id !== index
+        const deleteTodo = todo.filter((_, ind) => {
+            return ind !== id
         })
-        setAllTodo(deletedTodo)
+        setTodo(deleteTodo)
+        setToggle(true)
     }
 
-    const editTodo=(id)=>{
-        const editedTodo = allTodo.find((_,id)=>{
-            return id === id
+    const editTodo = (id) => {
+        const updatedTodo = todo.find((_, ids) => {
+            return ids === id
         })
-        setTodo(editedTodo)
-        setEditId(id)
-        setToggle(false)
+        setInputTodo(updatedTodo)
+        setEditIndex(id);
     }
+    
 
     return (
         <>
             <div>
                 <h1>Create Your Todo!</h1>
-                <input type='text' placeholder='Enter your todo...' value={todo} onChange={(e) => setTodo(e.target.value)} />
+                <input type='text' placeholder='Enter your todo' value={inputTodo} onChange={(e) => setInputTodo(e.target.value)} />
                 {
                     toggle ? <button onClick={addTodo}>Add</button> : <button onClick={addTodo}>Save</button>
                 }
+                {/* <button onClick={addTodo}>Add</button> */}
                 {
-                    allTodo.map((item, index) => {
-                        return <>
-                            <div key={index}>
-                                <ul>
-                                    <li>
-                                        {item}<button onClick={() => deleteTodo(index)}>Delete</button><button onClick={editTodo}>Edit</button><input type='checkbox' />
-                                    </li>
-                                </ul>
-                            </div>
-                        </>
-                    })
+                    todo.map((item, ind) => (
+                        <div style={dynamicStyle} key={ind}>
+                            {item}<button onClick={() => deleteTodo(ind)}>Delete</button><button onClick={() => editTodo(ind)}>Edit</button><input
+                                type="checkbox"
+                                checked={completed}
+                                onChange={() => setCompleted(!completed)}
+                            />
+                        </div>
+                    ))
                 }
             </div>
         </>
     )
 }
 
-export default TodoList
+export default Todolist
